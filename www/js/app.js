@@ -6,66 +6,107 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers'])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if (window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+.run(function($ionicPlatform, scraprFactory) {
+    $ionicPlatform.ready(function() {
+        // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+        // for form inputs)
+        if (window.cordova && window.cordova.plugins.Keyboard) {
+            cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        }
+        if (window.StatusBar) {
+            // org.apache.cordova.statusbar required
+            StatusBar.styleDefault();
+        }
+        
+        scraprFactory.base_url = 'http://gtrack.org/flickr/';
+        $rootScope.counts = {
+            follow: 0,
+            search: 0,
+            saved: 0
+        };
+    });
+})
+
+.factory('scraprFactory', function($http) {
+    var scraprFactory = {};
+    
+    scraprFactory.api_key = null;
+    scraprFactory.counts = {};
+    scraprFactory.base_url = '';
+    
+    scraprFactory._do_api_request = function(type, endpoint, data) {
+        data.api_key = this.api_key;
+        data.mode = endpoint;
+        
+        url_data = {
+            method: type,
+            url: this.base_url+'ajax.php',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            transformRequest: function(obj) {
+                var str = [];
+                for(var p in obj)
+                    str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                return str.join("&");
+            }
+        };
+        
+        if(type == 'get') {
+            url_data.params = data;
+        } else {
+            url_data.data = data;
+        }
+        
+        return $http(url_data);
+    };
+    
+    scraprFactory.login = function(username, password) {
+        return this._do_api_request('post', 'login', {username: username, password: password});
+    };
+    
+    scraprFactory.get_photos = function(type, start_id, last_id) {
+        return this._do_api_request('get', type+'_photos', {start_id: start_id, last_id: last_id});
     }
-    if (window.StatusBar) {
-      // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();
-    }
-  });
+    
+    return scraprFactory;
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
-
-  .state('app', {
-    url: "/app",
-    abstract: true,
-    templateUrl: "templates/menu.html",
-    controller: 'AppCtrl'
-  })
-
-  .state('app.search', {
-    url: "/search",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/search.html"
-      }
-    }
-  })
-
-  .state('app.browse', {
-    url: "/browse",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/browse.html"
-      }
-    }
-  })
-    .state('app.playlists', {
-      url: "/playlists",
-      views: {
-        'menuContent': {
-          templateUrl: "templates/playlists.html",
-          controller: 'PlaylistsCtrl'
-        }
-      }
+    .state('app', {
+        url: "/app",
+        abstract: true,
+        templateUrl: "templates/menu.html",
+        controller: 'AppCtrl'
     })
 
-  .state('app.single', {
-    url: "/playlists/:playlistId",
-    views: {
-      'menuContent': {
-        templateUrl: "templates/playlist.html",
-        controller: 'PlaylistCtrl'
-      }
-    }
-  });
+    .state('app.photos', {
+        url: "/photos/:type",
+        views: {
+            'menuContent': {
+                templateUrl: "templates/photos.html",
+                controller: 'PhotosCtrl'
+            }
+        }
+    })
+
+    .state('app.main', {
+        url: "/main",
+        views: {
+            'menuContent': {
+                templateUrl: "templates/main.html"
+            }
+        }
+    })
+    
+    .state('app.follows', {
+        url: "/follows",
+        views: {
+            'menuContent': {
+                templateUrl: "templates/admin/follows.html",
+                controller: 'FollowsCtrl'
+            }
+        }
+    });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/playlists');
+  $urlRouterProvider.otherwise('/app/main');
 });

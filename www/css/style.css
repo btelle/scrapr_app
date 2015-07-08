@@ -1,1 +1,6 @@
 /* Empty. Add your own CSS if you like */
+
+.lg-photo img {
+    max-width: 100%;
+    margin-bottom: 2px;
+}

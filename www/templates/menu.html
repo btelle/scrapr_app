@@ -14,21 +14,24 @@
 
   <ion-side-menu side="left">
     <ion-header-bar class="bar-stable">
-      <h1 class="title">Left</h1>
+      <h1 class="title">Scrapr</h1>
     </ion-header-bar>
     <ion-content>
       <ion-list>
-        <ion-item menu-close ng-click="login()">
-          Login
+        <ion-item menu-close href="#/app/photos/follow">
+          People You Follow <span class="badge badge-positive">{{counts.follow}}</span>
         </ion-item>
-        <ion-item menu-close href="#/app/search">
-          Search
+        <ion-item menu-close href="#/app/photos/search">
+          Search Results <span class="badge badge-positive">{{counts.search}}</span>
         </ion-item>
-        <ion-item menu-close href="#/app/browse">
-          Browse
+        <ion-item menu-close href="#/app/photos/saved">
+          Saved <span class="badge badge-positive">{{counts.saved}}</span>
         </ion-item>
-        <ion-item menu-close href="#/app/playlists">
-          Playlists
+        <ion-item divider>
+            Admin
+        </ion-item>
+        <ion-item menu-close href="#/app/follows">
+          Manage Follows
         </ion-item>
       </ion-list>
     </ion-content>
