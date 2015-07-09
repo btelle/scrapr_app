@@ -9,7 +9,13 @@ angular.module('starter.controllers', [])
         scope: $scope
     }).then(function(modal) {
         $scope.modal = modal;
-        $scope.login();
+        console.log(scraprFactory.api_key);
+        
+        if(scraprFactory.api_key == null) {
+            $scope.login();
+        } else {
+            $scope.verifyKey();
+        }
     });
 
     // Triggered in the login modal to close it
@@ -29,6 +35,7 @@ angular.module('starter.controllers', [])
         scraprFactory.login($scope.loginData.username, $scope.loginData.password)
             .success(function(data) {
                 scraprFactory.api_key = data.api_key;
+                localStorage.setItem("api_key", data.api_key); 
                 $rootScope.counts = {
                     follow: data.new_follow_count, 
                     search: data.new_search_count,
@@ -36,12 +43,38 @@ angular.module('starter.controllers', [])
                 };
                 
                 $scope.closeLogin();
-                $state.go('app.photos', {type: 'follow'});
             })
             .error(function(e) {
                 console.log(e);
             });
     };
+    
+    $scope.verifyKey = function() {
+        scraprFactory.verify_api_key()
+            .success(function(data) {
+                $rootScope.counts = {
+                    follow: data.new_follow_count, 
+                    search: data.new_search_count,
+                    saved: data.new_saved_count
+                };
+            })
+            .error(function(e) {
+                $scope.login();
+            });
+    };
+})
+
+.controller('LogoutCtrl', function($scope, $state, scraprFactory) {
+    $scope.$on('$ionicView.enter', function() {
+		console.log('Logging out');
+    
+        scraprFactory.api_key = null;
+        localStorage.removeItem('api_key');
+        
+        $scope.loginData = {};
+        $scope.login();
+        $state.go('app.main');
+	});
 })
 
 .controller('PhotosCtrl', function($scope, $stateParams, scraprFactory) {

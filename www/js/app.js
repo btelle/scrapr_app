@@ -19,6 +19,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         }
         
         scraprFactory.base_url = 'http://gtrack.org/flickr/';
+        scraprFactory.api_key = localStorage.getItem("api_key");
     });
 })
 
@@ -58,6 +59,10 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         return this._do_api_request('post', 'login', {username: username, password: password});
     };
     
+    scraprFactory.verify_api_key = function() {
+        return this._do_api_request('get', 'confirm_key', {});
+    }
+    
     scraprFactory.get_photos = function(type, start_id, last_id) {
         return this._do_api_request('get', type+'_photos', {start_id: start_id, last_id: last_id});
     };
@@ -84,6 +89,16 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         abstract: true,
         templateUrl: "templates/menu.html",
         controller: 'AppCtrl'
+    })
+    
+    .state('app.logout', {
+        url: "/logout",
+        views: {
+            'menuContent': {
+                templateUrl: "templates/logout.html",
+                controller: 'LogoutCtrl'
+            }
+        }
     })
 
     .state('app.photos', {

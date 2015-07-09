@@ -1,4 +1,33 @@
 <ion-view view-title="Scrapr">
   <ion-content>
+    <ion-list>
+        <ion-item divider>
+            Photos
+        </ion-item>
+        <ion-item menu-close href="#/app/photos/follow">
+          People You Follow <span class="badge badge-positive">{{counts.follow}}</span>
+        </ion-item>
+        <ion-item menu-close href="#/app/photos/search">
+          Search Results <span class="badge badge-positive">{{counts.search}}</span>
+        </ion-item>
+        <ion-item menu-close href="#/app/photos/saved">
+          Saved <span class="badge badge-positive">{{counts.saved}}</span>
+        </ion-item>
+        <ion-item divider>
+            Admin
+        </ion-item>
+        <ion-item menu-close href="#/app/follows">
+          Manage Follows
+        </ion-item>
+        <ion-item menu-close href="#/app/queries">
+          Manage Search Queries
+        </ion-item>
+        <ion-item menu-close href="#/app/filters">
+          Manage Filters
+        </ion-item>
+        <ion-item menu-close href="#/app/logout">
+          Logout
+        </ion-item>
+    </ion-list>
   </ion-content>
 </ion-view>
