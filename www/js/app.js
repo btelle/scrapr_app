@@ -19,11 +19,6 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         }
         
         scraprFactory.base_url = 'http://gtrack.org/flickr/';
-        $rootScope.counts = {
-            follow: 0,
-            search: 0,
-            saved: 0
-        };
     });
 })
 
@@ -65,8 +60,20 @@ angular.module('starter', ['ionic', 'starter.controllers'])
     
     scraprFactory.get_photos = function(type, start_id, last_id) {
         return this._do_api_request('get', type+'_photos', {start_id: start_id, last_id: last_id});
-    }
+    };
+	
+	scraprFactory.get_profiles = function() {
+		return this._do_api_request('get', 'all_profiles', {});
+	};
     
+    scraprFactory.save_profile = function(profile) {
+        return this._do_api_request('post', 'profile', profile);
+    };
+    
+    scraprFactory.delete_profile = function(profile) {
+        return this._do_api_request('post', 'delete_profile', profile);
+    }
+	
     return scraprFactory;
 })
 

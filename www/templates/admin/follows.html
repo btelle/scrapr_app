@@ -1,4 +1,14 @@
 <ion-view view-title="People You Follow">
+  <ion-nav-buttons side="primary">
+    <button class="button" ng-click="open_follow()">
+        New
+    </button>
+  </ion-nav-buttons>
   <ion-content>
+	<ion-list>
+	  <ion-item ng-repeat="profile in profiles" ng-click="open_follow(profile)" on-hold="show_follow_actionsheet(profile)">
+		{{profile.name}}
+	  </ion-item>
+	</ion-list>
   </ion-content>
 </ion-view>

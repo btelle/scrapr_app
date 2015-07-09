@@ -63,8 +63,89 @@ angular.module('starter.controllers', [])
         });
 })
 
-.controller('FollowsCtrl', function($scope, $stateParams, scraprFactory) {
+.controller('FollowsCtrl', function($scope, $stateParams, $ionicModal, $ionicPopup, $ionicActionSheet, scraprFactory) {
     console.log('Running Follows');
+	
+    $scope.profiles = [];
+    
+    $scope.load_profiles = function() {
+        scraprFactory.get_profiles().success(function(data) {
+			$scope.profiles = data.profiles;
+		});
+    }
+    
+	$scope.$on('$ionicView.enter', function() {
+		$scope.load_profiles();
+	});
+	
+	$scope.open_follow = function(follow) {
+		$scope.profile = follow;
+		$scope.follow_modal.show();
+	};
+    
+    $scope.close_follow = function() {
+        $scope.follow_modal.hide();
+    }
+    
+    $scope.save_follow = function(profile) {
+        scraprFactory.save_profile(profile)
+            .success(function(data) {
+                $scope.close_follow();
+                $scope.load_profiles();
+                
+                $ionicPopup.alert({
+                    title: 'Saved profile'
+                });
+            })
+            .error(function(e) {
+            
+            });
+    };
+    
+    $scope.delete_follow = function(profile) {
+        var confirmPopup = $ionicPopup.confirm({
+            title: 'Delete profile',
+            template: 'Are you sure you want to delete this profile. This will also delete any photos associated with their account.'
+        });
+        confirmPopup.then(function(res) {
+            if(res) {
+                scraprFactory.delete_profile(profile).success(function(data) {
+                    $ionicPopup.alert({
+                        title: 'Deleted profile'
+                    });
+                    
+                    $scope.load_profiles();
+                });
+            } else {
+                console.log('You are not sure');
+            }
+        });
+    };
+    
+    $scope.show_follow_actionsheet = function(profile) {
+        var hideSheet = $ionicActionSheet.show({
+            buttons: [
+                { text: 'Edit' }
+            ],
+            destructiveText: 'Delete',
+            cancelText: 'Cancel',
+            buttonClicked: function(index) {
+                if(index == 0) {
+                    $scope.open_follow(profile);
+                }
+            }, 
+            destructiveButtonClicked: function() {
+                $scope.delete_follow(profile);
+                return true;
+            }
+        });
+    };
+	
+	$ionicModal.fromTemplateUrl('templates/admin/follow_edit.html', {
+        scope: $scope
+    }).then(function(modal) {
+        $scope.follow_modal = modal;
+    });
 })
 
 .controller('PlaylistsCtrl', function($scope) {
